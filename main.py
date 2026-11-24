@@ -28,20 +28,26 @@ MAX_LENGTH = 220
 SENTENCE_ENDINGS = (".", "!", "?")
 
 
-def validate(text):
-    """Check the pitch against the competition gate.
+def check_length(text):
+    """Check the pitch against the competition length gate.
 
-    Returns a list of problems; an empty list means the text is valid.
+    Returns a list of problems; an empty list means the length is valid.
     """
     problems = []
-    if not text or not text.strip():
-        problems.append("entry is empty or whitespace only")
-        return problems
     if not MIN_LENGTH <= len(text) <= MAX_LENGTH:
         problems.append(
             "entry is %d characters, outside the %d-%d range"
             % (len(text), MIN_LENGTH, MAX_LENGTH)
         )
+    return problems
+
+
+def check_sentence_shape(text):
+    """Check the pitch is exactly one sentence on a single line.
+
+    Returns a list of problems; an empty list means the shape is valid.
+    """
+    problems = []
     if "\n" in text.strip():
         problems.append("entry must be a single line")
     endings = sum(text.count(ch) for ch in SENTENCE_ENDINGS)
@@ -52,6 +58,20 @@ def validate(text):
         )
     elif not text.rstrip().endswith(SENTENCE_ENDINGS):
         problems.append("entry must end with a sentence-ending mark")
+    return problems
+
+
+def validate(text):
+    """Check the pitch against the competition gate.
+
+    Returns a list of problems; an empty list means the text is valid.
+    """
+    problems = []
+    if not text or not text.strip():
+        problems.append("entry is empty or whitespace only")
+        return problems
+    problems.extend(check_length(text))
+    problems.extend(check_sentence_shape(text))
     return problems
 
 
